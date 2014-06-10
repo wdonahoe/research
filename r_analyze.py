@@ -25,8 +25,8 @@ def read_files(script, folder = None):
 		os.chdir(folder)
 
 	args = [file for file in os.listdir(os.getcwd()) if file.endswith('.txt') and not file is "out.txt"]
-	args.sort(key = lambda x : os.path.getmtime(x)) ## Sort by last change.
-	
+	args.sort(key = lambda x : os.path.getctime(x)) ## Sort by creation time.
+
 	subprocess.check_call(["./" + script] + args, stderr = subprocess.STDOUT)
 	print "Done."
 	os.remove(script)
