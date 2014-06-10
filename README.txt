@@ -5,8 +5,9 @@ r_analyze.py.
 
 Usage: 
 
-1 ) ./r_analyze.py <R script> <folder> To analyze text files in folder.
-2 ) ./r_analyze.py <R script> To analyze text files in this folder.
+1) ./r_analyze.py <R script> <folder> To analyze text files in folder.
+2) ./r_analyze.py <R script> To analyze text files in this folder.
 
 <R script> can be only the filename without extension, or with .R extension.
+
 
