@@ -1,0 +1,10 @@
+Wed Jun 11 14:38:33 2014  Welcome to egm4.R
+Wed Jun 11 14:38:33 2014  Loading libraries...
+Wed Jun 11 14:38:33 2014  Loading ggplot2
+Wed Jun 11 14:38:34 2014  Loading reshape
+Wed Jun 11 14:38:34 2014  Loading plyr
+Wed Jun 11 14:38:34 2014  -------------------
+Wed Jun 11 14:38:34 2014  Reading July182013P2.dat
+Wed Jun 11 14:38:34 2014  d rows = 815 cols = 19
+Wed Jun 11 14:38:34 2014  Adding seconds (interval = 10 )
+Wed Jun 11 14:38:34 2014  Computing CO2~Time R2 values for quality control...

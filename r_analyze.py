@@ -23,10 +23,11 @@ def read_files(script, folder = None):
 		if not script in os.listdir(folder):
 			shutil.copy2(script, folder)
 		os.chdir(folder)
-
-	args = [file for file in os.listdir(os.getcwd()) if file.endswith('.txt') and not file is "out.txt"]
+		
+	args = [file for file in os.listdir(os.getcwd()) if file.endswith('.dat') and not file is "out.txt"]
 	args.sort(key = lambda x : os.path.getctime(x)) ## Sort by creation time.
 
+	print "Reading .dat files."
 	subprocess.check_call(["./" + script] + args, stderr = subprocess.STDOUT)
 	print "Done."
 	os.remove(script)
