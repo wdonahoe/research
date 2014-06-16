@@ -5,16 +5,22 @@
 
 # Support functions and common definitions
 
+args = commandArgs( trailingOnly = TRUE )
 
-SCRIPTNAME		<- "egm4.R"
-OUTPUT_DIR		<- "outputs/"
-LOG_DIR			<- "logs/"
+SCRIPTNAME		<- "egm4_v2.R"
+OUTPUT_DIR		<- "outputs"
+INPUT_DIR		<- args[1]
+LOG_DIR			<- "logs"
 SEPARATOR		<- "-------------------"
 MEAS_INTERVAL	<- 10
 
-input_file_names = commandArgs( trailingOnly = TRUE )
+files = args[-1]
 
-print( input_file_names )
+printfiles <- function( files ) {
+	cat( "Reading the following files:" )
+	for ( file in files )
+		cat(file, sep = "\n")
+}
 
 # -----------------------------------------------------------------------------
 # Time-stamped output function
@@ -32,38 +38,13 @@ printdims <- function( d, dname=deparse( substitute( d ) ) ) {
 } # printdims
 
 # -----------------------------------------------------------------------------
-# Return matrix of memory consumption
-object.sizes <- function()
-{
-    return( rev( sort( sapply( ls( envir=.GlobalEnv ), function( object.name ) 
-        object.size( get( object.name ) ) ) ) ) )
-}
- 
-# -----------------------------------------------------------------------------
-# Save a ggplot figure
-saveplot <- function( pname, p=last_plot(), ptype=".pdf" ) {
-	stopifnot( file.exists( OUTPUT_DIR ) )
-	fn <- paste( OUTPUT_DIR, "/", pname, ptype )
-	printlog( "Saving", fn )
-	ggsave( fn, p )
-} # saveplot
-
-# -----------------------------------------------------------------------------
 # Save a data frame
 savedata <- function( df, extension=".csv" ) {
 	stopifnot( file.exists( OUTPUT_DIR ) )
-	fn <- paste( OUTPUT_DIR, "/", deparse( substitute( df ) ), extension )
+	fn <- paste0( OUTPUT_DIR, "/", deparse( substitute( df ) ), extension )
 	printlog( "Saving", fn )
 	write.csv( df, fn, row.names=F )
-} # saveplot
-
-# -----------------------------------------------------------------------------
-# Open a csv file and return data
-read_csv <- function( fn, datadir="." ) {
-	fqfn <- paste( datadir, fn, sep="/" )
-	printlog( "Opening", fqfn )
-	read.csv( fqfn, stringsAsFactors=F )
-} # read_csv
+} # savedata
 
 # -----------------------------------------------------------------------------
 # Load requested libraries
@@ -79,10 +60,18 @@ loadlibs <- function( liblist ) {
 	invisible( loadedlibs )
 } # loadlibs
 
+#clean_egm <- function ( fn ) {
+#	fqfn <- paste0( INPUT_DIR, fn )
+#	stopifnot( file.exists( fqfn ) )
+#	d <- read.table( fqfn, comment.char=";", sep="\t" )
+#	for (row in d.ro)
+#}
+
 # -----------------------------------------------------------------------------
 # read a process a single EGM4 output file, returning data frame
 read_egmfile <- function( fn ) {
-	fqfn <- fn
+	fqfn <- paste0( INPUT_DIR, fn )
+	print(fqfn)
 	printlog( "Reading", fqfn )
 	stopifnot( file.exists( fqfn ) )
 	d <- read.table( fqfn, comment.char=";", sep="\t" )
@@ -94,13 +83,15 @@ read_egmfile <- function( fn ) {
 	printlog( "Adding seconds (interval =", MEAS_INTERVAL, ")" )
 	d <- ddply( d, .( Plot ), mutate, Sec=seq( from=0, length.out=length( Plot ), by=MEAS_INTERVAL ) )
 	
-	# QC
+	#QC
 	printlog( "Computing CO2~Time R2 values for quality control..." )
-	mods <- dlply( d, .( Plot ), lm, formula = CO2_Ref ~ Sec )
+	mods <- dlply( d, .( Plot ), lm, formula = CO2_Ref ~ Sec, na.action = na.omit, .inform = T)
 	r2 <- ldply( mods, .fun=function( x ){ round( summary( x )$r.squared, 2 ) } )
 	names( r2 ) <- c( "Plot", "R2" )
 	r2 <- r2[ order( r2$R2 ), ]
 	print( r2 )
+
+	return(d)
 
 } # read_egmfile
 
@@ -161,16 +152,16 @@ if( !file.exists( LOG_DIR ) ) {
 	dir.create( LOG_DIR )
 }
 
-sink( paste( LOG_DIR, SCRIPTNAME, ".txt" ), split=T )
+sink( paste0( LOG_DIR, SCRIPTNAME, ".txt" ), split=T )
 
 printlog( "Welcome to", SCRIPTNAME )
 
-loadlibs( c( "ggplot2", "reshape", "plyr" ) )
-##theme_set( theme_bw() )
+loadlibs( c( "ggplot2", "reshape2", "plyr" ) )
+theme_set( theme_bw() )
 
 alldata <- data.frame()
 
-for( fn in input_file_names ) {
+for( fn in files ) {
 	printlog( SEPARATOR )
 	alldata <- rbind( alldata, read_egmfile( fn ) )
 }
@@ -193,5 +184,5 @@ printlog( "Saving flux data..." )
 savedata( fluxes )
 
 printlog( "All done with", SCRIPTNAME )
-print( sessionInfo() )
+#print( sessionInfo() )
 sink()

@@ -3,6 +3,7 @@ import os
 import sys
 import subprocess
 import shutil
+import string
 
 def print_usage():
 	message = "\nUsage: ./r_analyze.py <R Script> <folder>\n"
@@ -19,18 +20,15 @@ def read_files(script, folder = None):
 	if not script.endswith(".R"):
 		script += ".R"
 
-	if not folder is None:
-		if not script in os.listdir(folder):
-			shutil.copy2(script, folder)
-		os.chdir(folder)
-		
-	args = [file for file in os.listdir(os.getcwd()) if file.endswith('.dat') and not file is "out.txt"]
-	args.sort(key = lambda x : os.path.getctime(x)) ## Sort by creation time.
+	if folder is None:
+		folder = os.getcwd()
+		sp = string.split(folder,'/')
+		folder = sp[len(sp) - 1]
+	
+	args = [file for file in os.listdir(folder) if file.endswith('.dat')]
+	args.sort(key = lambda x : os.path.getctime(folder +"/" + x)) ## Sort by creation time.
 
-	print "Reading .dat files."
-	subprocess.check_call(["./" + script] + args, stderr = subprocess.STDOUT)
-	print "Done."
-	os.remove(script)
+	subprocess.call(["./" + script] + [folder + "/"] + args)
 
 def main(argv):
 	if len(argv) == 1:
