@@ -1,14 +1,13 @@
-Mon Jun 16 10:25:01 2014  Welcome to egm4_v2.R
-Mon Jun 16 10:25:01 2014  Loading libraries...
-Mon Jun 16 10:25:01 2014  Loading ggplot2
-Mon Jun 16 10:25:02 2014  Loading reshape2
-Mon Jun 16 10:25:02 2014  Loading plyr
-Mon Jun 16 10:25:02 2014  -------------------
-[1] "data/July182013P22.dat"
-Mon Jun 16 10:25:02 2014  Reading data/July182013P22.dat
-Mon Jun 16 10:25:02 2014  d rows = 792 cols = 19
-Mon Jun 16 10:25:02 2014  Adding seconds (interval = 10 )
-Mon Jun 16 10:25:02 2014  Computing CO2~Time R2 values for quality control...
+Wed Jun 18 16:51:53 2014  Welcome to egm4_v2.R
+Wed Jun 18 16:51:53 2014  Loading libraries...
+Wed Jun 18 16:51:53 2014  Loading ggplot2
+Wed Jun 18 16:51:53 2014  Loading reshape2
+Wed Jun 18 16:51:53 2014  Loading plyr
+Wed Jun 18 16:51:54 2014  -------------------
+Wed Jun 18 16:51:54 2014  Reading data/July182013P22.dat
+Wed Jun 18 16:51:54 2014  d rows = 792 cols = 19
+Wed Jun 18 16:51:54 2014  Adding seconds (interval = 10 )
+Wed Jun 18 16:51:54 2014  Computing CO2~Time R2 values for quality control...
    Plot   R2
 1    14 0.96
 9    36 0.96
@@ -34,89 +33,59 @@ Mon Jun 16 10:25:02 2014  Computing CO2~Time R2 values for quality control...
 21   76 1.00
 23   85 1.00
 24   86 1.00
-Mon Jun 16 10:25:02 2014  -------------------
-[1] "data/July182013P22 (copy).dat"
-Mon Jun 16 10:25:02 2014  Reading data/July182013P22 (copy).dat
-Mon Jun 16 10:25:02 2014  d rows = 792 cols = 19
-Mon Jun 16 10:25:02 2014  Adding seconds (interval = 10 )
-Mon Jun 16 10:25:02 2014  Computing CO2~Time R2 values for quality control...
+Wed Jun 18 16:51:54 2014  -------------------
+Wed Jun 18 16:51:54 2014  Reading data/August122013P12.dat
+Wed Jun 18 16:51:54 2014  d rows = 768 cols = 19
+Wed Jun 18 16:51:54 2014  Adding seconds (interval = 10 )
+Wed Jun 18 16:51:54 2014  Computing CO2~Time R2 values for quality control...
    Plot   R2
-1    14 0.96
-9    36 0.96
-16   64 0.97
-2    15 0.99
-4    24 0.99
-20   75 0.99
-22   84 0.99
-3    16 1.00
-5    25 1.00
-6    26 1.00
-7    34 1.00
-8    35 1.00
-10   44 1.00
-11   45 1.00
-12   46 1.00
-13   54 1.00
-14   55 1.00
-15   56 1.00
-17   65 1.00
-18   66 1.00
-19   74 1.00
-21   76 1.00
-23   85 1.00
-24   86 1.00
-Mon Jun 16 10:25:02 2014  -------------------
-[1] "data/July182013P22 (another copy).dat"
-Mon Jun 16 10:25:02 2014  Reading data/July182013P22 (another copy).dat
-Mon Jun 16 10:25:02 2014  d rows = 792 cols = 19
-Mon Jun 16 10:25:02 2014  Adding seconds (interval = 10 )
-Mon Jun 16 10:25:02 2014  Computing CO2~Time R2 values for quality control...
-   Plot   R2
-1    14 0.96
-9    36 0.96
-16   64 0.97
-2    15 0.99
-4    24 0.99
-20   75 0.99
-22   84 0.99
-3    16 1.00
-5    25 1.00
-6    26 1.00
-7    34 1.00
-8    35 1.00
-10   44 1.00
-11   45 1.00
-12   46 1.00
-13   54 1.00
-14   55 1.00
-15   56 1.00
-17   65 1.00
-18   66 1.00
-19   74 1.00
-21   76 1.00
-23   85 1.00
-24   86 1.00
-Mon Jun 16 10:25:02 2014  -------------------
-Mon Jun 16 10:25:02 2014  All done reading data.
-Mon Jun 16 10:25:02 2014  alldata rows = 2376 cols = 21
-Mon Jun 16 10:25:02 2014  Merging respiration data with dry mass data...
-Mon Jun 16 10:25:02 2014  Computing fluxes...
-   filename              Plot         Tair             V            
- Length:72          Min.   :14   Min.   :23.12   Min.   :0.0001042  
- Class :character   1st Qu.:32   1st Qu.:24.17   1st Qu.:0.0001042  
- Mode  :character   Median :50   Median :26.32   Median :0.0001042  
-                    Mean   :50   Mean   :26.33   Mean   :0.0001042  
-                    3rd Qu.:68   3rd Qu.:28.33   3rd Qu.:0.0001042  
-                    Max.   :86   Max.   :29.34   Max.   :0.0001042  
-       S              Day         Month         N           flux       
- Min.   :5.498   Min.   :18   Min.   :7   Min.   :33   Min.   : 218.5  
- 1st Qu.:5.498   1st Qu.:18   1st Qu.:7   1st Qu.:33   1st Qu.: 685.5  
- Median :5.498   Median :18   Median :7   Median :33   Median :1058.3  
- Mean   :5.498   Mean   :18   Mean   :7   Mean   :33   Mean   :1373.3  
- 3rd Qu.:5.498   3rd Qu.:18   3rd Qu.:7   3rd Qu.:33   3rd Qu.:1734.5  
- Max.   :5.498   Max.   :18   Max.   :7   Max.   :33   Max.   :4277.6  
-Mon Jun 16 10:25:02 2014  Saving flux data...
-Mon Jun 16 10:25:02 2014  Saving outputs/alldata.csv
-Mon Jun 16 10:25:02 2014  Saving flux data...
-Mon Jun 16 10:25:02 2014  Saving outputs/fluxes.csv
-Mon Jun 16 10:25:02 2014  All done with egm4_v2.R
+10   41 0.89
+3    13 0.99
+13   51 0.99
+1    11 1.00
+2    12 1.00
+4    21 1.00
+5    22 1.00
+6    23 1.00
+7    31 1.00
+8    32 1.00
+9    33 1.00
+11   42 1.00
+12   43 1.00
+14   52 1.00
+15   53 1.00
+16   61 1.00
+17   62 1.00
+18   63 1.00
+19   71 1.00
+20   72 1.00
+21   73 1.00
+22   81 1.00
+23   82 1.00
+24   83 1.00
+Wed Jun 18 16:51:54 2014  -------------------
+Wed Jun 18 16:51:54 2014  All done reading data.
+Wed Jun 18 16:51:54 2014  alldata rows = 1560 cols = 21
+Wed Jun 18 16:51:54 2014  Merging respiration data with dry mass data...
+Wed Jun 18 16:51:54 2014  Computing fluxes...
+   filename              Plot            Tair             V          
+ Length:48          Min.   :11.00   Min.   :21.09   Min.   :0.00282  
+ Class :character   1st Qu.:29.75   1st Qu.:22.40   1st Qu.:0.00282  
+ Mode  :character   Median :48.50   Median :23.77   Median :0.00282  
+                    Mean   :48.50   Mean   :24.36   Mean   :0.00282  
+                    3rd Qu.:67.25   3rd Qu.:26.26   3rd Qu.:0.00282  
+                    Max.   :86.00   Max.   :29.34   Max.   :0.00282  
+                                                    NA's   :24       
+       S              Day         Month           N             flux         
+ Min.   :78.54   Min.   :12   Min.   :7.0   Min.   :32.0   Min.   :0.009425  
+ 1st Qu.:78.54   1st Qu.:12   1st Qu.:7.0   1st Qu.:32.0   1st Qu.:0.036855  
+ Median :78.54   Median :15   Median :7.5   Median :32.5   Median :0.053632  
+ Mean   :78.54   Mean   :15   Mean   :7.5   Mean   :32.5   Mean   :0.062597  
+ 3rd Qu.:78.54   3rd Qu.:18   3rd Qu.:8.0   3rd Qu.:33.0   3rd Qu.:0.080307  
+ Max.   :78.54   Max.   :18   Max.   :8.0   Max.   :33.0   Max.   :0.178473  
+                                                           NA's   :24        
+Wed Jun 18 16:51:54 2014  Saving flux data...
+Wed Jun 18 16:51:54 2014  Saving outputs/alldata.csv
+Wed Jun 18 16:51:54 2014  Saving flux data...
+Wed Jun 18 16:51:54 2014  Saving outputs/fluxes.csv
+Wed Jun 18 16:51:54 2014  All done with egm4_v2.R
