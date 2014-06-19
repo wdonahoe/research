@@ -5,10 +5,12 @@ import subprocess
 import shutil
 import string
 import optparse
+import datetime
 
 def print_usage():
 	message = "\nUsage: ./r_analyze.py <R Script> <height_file> [<folder>]\n"
 	print message
+
 
 def read_files(script, height, folder = None):
 	""" Execute an R script on a series of text files.
@@ -27,8 +29,6 @@ def read_files(script, height, folder = None):
 		folder = sp[len(sp) - 1]
 	
 	args = [file for file in os.listdir(folder) if file.endswith('.dat')]
-	args.sort(key = lambda x : os.path.getctime(folder +"/" + x)) ## Sort by creation time.
-
 	args.insert(0, height) if height.endswith(".txt") else args.insert(0, height + ".txt")
 
 	try:
@@ -48,6 +48,7 @@ def main():
 		read_files(args[0], args[1])
 	elif (len(args) == 3):
 		read_files(args[0], args[1], args[2])
+		
 
 if __name__ == "__main__":
 	main()

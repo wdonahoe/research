@@ -7,6 +7,7 @@
 
 args = commandArgs( trailingOnly = TRUE )
 
+# Constants
 SCRIPTNAME		<- "egm4_v2.R"
 OUTPUT_DIR		<- "outputs"
 LOG_DIR			<- "logs"
@@ -14,6 +15,7 @@ SEPARATOR		<- "-------------------"
 MEAS_INTERVAL	<- 10
 HEIGHT_OPTIONS	<- args[2]
 INPUT_DIR		<- args[1]
+DATE_FORMAT		<- "%B%d%Y"
 
 files <- args[-( 1:2 )]
 	
@@ -45,10 +47,11 @@ savedata <- function( df, extension=".csv" ) {
 	stopifnot( file.exists( OUTPUT_DIR ) )
 	fn <- paste0( OUTPUT_DIR, "/", deparse( substitute( df ) ), extension )
 	printlog( "Saving", fn )
-	write.csv( df, fn, row.names=F )
+	write.csv( df, fn, row.names=FALSE )
 } # savedata
 
-get_height <- function( ){
+# Put height data in a frame.
+get_height <- function( ) {
 	heights <- paste0( INPUT_DIR, HEIGHT_OPTIONS )
 	stopifnot( file.exists( heights ) )
 	h <- read.table( heights, comment.char=";",sep="\t" )
@@ -56,8 +59,15 @@ get_height <- function( ){
 	names( h ) <- c("Plot", "Height")
 	arrange(h, Plot)
 
-	h
-}
+	return( h )
+} #get_height
+
+# Convert a filename containing a date to a Date object.
+format_date <- function( fn ) {
+	date <- unlist( strsplit( fn, c( "P","." ), fixed=TRUE ) )[ 1 ]
+
+	return( as.Date( date, DATE_FORMAT ) )
+} #format_date
 
 # -----------------------------------------------------------------------------
 # Load requested libraries
@@ -66,19 +76,21 @@ loadlibs <- function( liblist ) {
 	loadedlibs <- vector()
 	for( lib in liblist ) {
 		printlog( "Loading", lib )
-		loadedlibs[ lib ] <- require( lib, character.only=T )
+		loadedlibs[ lib ] <- require( lib, character.only=TRUE )
 		if( !loadedlibs[ lib ] )
 			warning( "this package is not installed!" )
 	}
 	invisible( loadedlibs )
 } # loadlibs
 
-#clean_egm <- function ( fn ) {
-#	fqfn <- paste0( INPUT_DIR, fn )
-#	stopifnot( file.exists( fqfn ) )
-#	d <- read.table( fqfn, comment.char=";", sep="\t" )
-#	for (row in d.ro)
-#}
+quality_control <- function( d ) {
+
+	mods <- dlply( d, .( Plot ), lm, formula = CO2_Ref ~ Sec )
+	r2 <- ldply( mods, .fun=function( x ){ round( summary( x )$r.squared, 2 ) } )
+	names( r2 ) <- c( "Plot", "R2" )
+	r2 <- r2[ order( r2$R2 ), ]
+	print( r2 )
+}
 
 # -----------------------------------------------------------------------------
 # read a process a single EGM4 output file, returning data frame
@@ -87,7 +99,7 @@ read_egmfile <- function( fn ) {
 	printlog( "Reading", fqfn )
 	stopifnot( file.exists( fqfn ) )
 	d <- read.table( fqfn, comment.char=";", sep="\t", na.strings="")
-	d <- d[1:19]
+	d <- d[ 1:19 ]
 	printdims( d )
 	names( d ) <- c( "Plot", "RecNo", "Day", "Month", "Hour", "Min", "CO2_Ref", "mb_Ref",
 		 "mbR_Temp", "Input_A", "Input_B", "Input_C", "Input_D", "Input_E", "Input_F", 
@@ -98,13 +110,9 @@ read_egmfile <- function( fn ) {
 	
 	# QC
 	printlog( "Computing CO2~Time R2 values for quality control..." )
-	mods <- dlply( d, .( Plot ), lm, formula = CO2_Ref ~ Sec )
-	r2 <- ldply( mods, .fun=function( x ){ round( summary( x )$r.squared, 2 ) } )
-	names( r2 ) <- c( "Plot", "R2" )
-	r2 <- r2[ order( r2$R2 ), ]
-	print( r2 )
+	quality_control( d ) 
 
-	d
+	return( d )
 } # read_egmfile
 
 # -----------------------------------------------------------------------------
@@ -131,10 +139,10 @@ compute_flux <- function( d ) {
 	sleeve_ht	<- as.numeric( d$Height[ 1 ] ) 			# height, cm
 	egm4_vol	<- 2427									# internal system volume, cm3
 	S 			<- pi * ring_r ^ 2						# note cm2, not m2!
-	sleeve_vol 	<- sleeve_ht * S 							# m3
+	sleeve_vol 	<- sleeve_ht * S 						# m3
 	V			<- ( egm4_vol + sleeve_vol ) / 100^3	# m3
-	R 			<- 7.436e-3								# m-3 kPa mol-1 K-1
-	Kelvin		<- 273.15								#C to K conversion
+	R 			<- 8.3145e-3							# m-3 kPa mol-1 K-1
+	Kelvin		<- 273.15								# C to K conversion
 	avg_temp 	<- mean( d$Input_C )					# assumes EGM temperature probe connected
 
 	# Convert from umol/g soil/s to mgC/kg soil/day
@@ -158,7 +166,7 @@ if( !file.exists( LOG_DIR ) ) {
 	dir.create( LOG_DIR )
 }
 
-sink( paste0( LOG_DIR, SCRIPTNAME, ".txt" ), split=T )
+sink( paste0( LOG_DIR, SCRIPTNAME, ".txt" ), split=TRUE )
 
 printlog( "Welcome to", SCRIPTNAME )
 
@@ -187,10 +195,11 @@ printlog( "Computing fluxes..." )
 flux <- function( d, h ) {
 	d$Height <- sapply( d$Plot, function( x ) h[ which( x == h$Plot ),"Height" ] )
 	flux <- ddply( d, .( filename, Plot ), .fun=compute_flux )
-	flux
+	return( flux )
 }
 
 fluxes <- flux( alldata, heights )
+fluxes <- fluxes[ order(sapply( fluxes$filename, function( x ) format_date( x ))), ]
 
 print( summary( fluxes ) )
 
