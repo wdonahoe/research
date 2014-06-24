@@ -1,13 +1,13 @@
-Thu Jun 19 12:38:27 2014  Welcome to egm4_v2.R
-Thu Jun 19 12:38:27 2014  Loading libraries...
-Thu Jun 19 12:38:27 2014  Loading ggplot2
-Thu Jun 19 12:38:28 2014  Loading reshape2
-Thu Jun 19 12:38:28 2014  Loading plyr
-Thu Jun 19 12:38:28 2014  -------------------
-Thu Jun 19 12:38:28 2014  Reading bad_data/May122012P12.dat
-Thu Jun 19 12:38:28 2014  d rows = 768 cols = 19
-Thu Jun 19 12:38:28 2014  Adding seconds (interval = 10 )
-Thu Jun 19 12:38:28 2014  Computing CO2~Time R2 values for quality control...
+Thu Jun 19 13:07:23 2014  Welcome to egm4_v2.R
+Thu Jun 19 13:07:23 2014  Loading libraries...
+Thu Jun 19 13:07:23 2014  Loading ggplot2
+Thu Jun 19 13:07:24 2014  Loading reshape2
+Thu Jun 19 13:07:24 2014  Loading plyr
+Thu Jun 19 13:07:24 2014  -------------------
+Thu Jun 19 13:07:24 2014  Reading bad_data/May122012P12.dat
+Thu Jun 19 13:07:24 2014  d rows = 768 cols = 19
+Thu Jun 19 13:07:24 2014  Adding seconds (interval = 10 )
+Thu Jun 19 13:07:24 2014  Computing CO2~Time R2 values for quality control...
    Plot   R2
 10   41 0.89
 3    13 0.99
@@ -33,11 +33,11 @@ Thu Jun 19 12:38:28 2014  Computing CO2~Time R2 values for quality control...
 22   81 1.00
 23   82 1.00
 24   83 1.00
-Thu Jun 19 12:38:28 2014  -------------------
-Thu Jun 19 12:38:28 2014  Reading bad_data/August132013P12.dat
-Thu Jun 19 12:38:28 2014  d rows = 768 cols = 19
-Thu Jun 19 12:38:28 2014  Adding seconds (interval = 10 )
-Thu Jun 19 12:38:28 2014  Computing CO2~Time R2 values for quality control...
+Thu Jun 19 13:07:24 2014  -------------------
+Thu Jun 19 13:07:24 2014  Reading bad_data/August132013P12.dat
+Thu Jun 19 13:07:24 2014  d rows = 768 cols = 19
+Thu Jun 19 13:07:24 2014  Adding seconds (interval = 10 )
+Thu Jun 19 13:07:24 2014  Computing CO2~Time R2 values for quality control...
    Plot   R2
 10   41 0.89
 3    13 0.99
@@ -63,11 +63,11 @@ Thu Jun 19 12:38:28 2014  Computing CO2~Time R2 values for quality control...
 22   81 1.00
 23   82 1.00
 24   83 1.00
-Thu Jun 19 12:38:28 2014  -------------------
-Thu Jun 19 12:38:28 2014  Reading bad_data/August122013P12.dat
-Thu Jun 19 12:38:28 2014  d rows = 768 cols = 19
-Thu Jun 19 12:38:28 2014  Adding seconds (interval = 10 )
-Thu Jun 19 12:38:28 2014  Computing CO2~Time R2 values for quality control...
+Thu Jun 19 13:07:24 2014  -------------------
+Thu Jun 19 13:07:24 2014  Reading bad_data/August122013P12.dat
+Thu Jun 19 13:07:24 2014  d rows = 768 cols = 19
+Thu Jun 19 13:07:24 2014  Adding seconds (interval = 10 )
+Thu Jun 19 13:07:24 2014  Computing CO2~Time R2 values for quality control...
    Plot   R2
 10   41 0.89
 3    13 0.99
@@ -93,11 +93,11 @@ Thu Jun 19 12:38:28 2014  Computing CO2~Time R2 values for quality control...
 22   81 1.00
 23   82 1.00
 24   83 1.00
-Thu Jun 19 12:38:28 2014  -------------------
-Thu Jun 19 12:38:28 2014  Reading bad_data/December032013P12.dat
-Thu Jun 19 12:38:28 2014  d rows = 768 cols = 19
-Thu Jun 19 12:38:28 2014  Adding seconds (interval = 10 )
-Thu Jun 19 12:38:28 2014  Computing CO2~Time R2 values for quality control...
+Thu Jun 19 13:07:24 2014  -------------------
+Thu Jun 19 13:07:24 2014  Reading bad_data/December032013P12.dat
+Thu Jun 19 13:07:24 2014  d rows = 768 cols = 19
+Thu Jun 19 13:07:24 2014  Adding seconds (interval = 10 )
+Thu Jun 19 13:07:24 2014  Computing CO2~Time R2 values for quality control...
    Plot   R2
 10   41 0.89
 3    13 0.99
@@ -123,11 +123,11 @@ Thu Jun 19 12:38:28 2014  Computing CO2~Time R2 values for quality control...
 22   81 1.00
 23   82 1.00
 24   83 1.00
-Thu Jun 19 12:38:28 2014  -------------------
-Thu Jun 19 12:38:28 2014  All done reading data.
-Thu Jun 19 12:38:28 2014  alldata rows = 3072 cols = 21
-Thu Jun 19 12:38:28 2014  Merging respiration data with dry mass data...
-Thu Jun 19 12:38:28 2014  Computing fluxes...
+Thu Jun 19 13:07:24 2014  -------------------
+Thu Jun 19 13:07:24 2014  All done reading data.
+Thu Jun 19 13:07:24 2014  alldata rows = 3072 cols = 21
+Thu Jun 19 13:07:24 2014  Merging respiration data with dry mass data...
+Thu Jun 19 13:07:24 2014  Computing fluxes...
    filename              Plot         Tair             V          
  Length:96          Min.   :11   Min.   :21.09   Min.   :0.00282  
  Class :character   1st Qu.:29   1st Qu.:21.66   1st Qu.:0.00282  
@@ -142,8 +142,8 @@ Thu Jun 19 12:38:28 2014  Computing fluxes...
  Mean   :78.54   Mean   :12   Mean   :8   Mean   :32   Mean   :0.06999  
  3rd Qu.:78.54   3rd Qu.:12   3rd Qu.:8   3rd Qu.:32   3rd Qu.:0.08979  
  Max.   :78.54   Max.   :12   Max.   :8   Max.   :32   Max.   :0.19956  
-Thu Jun 19 12:38:29 2014  Saving flux data...
-Thu Jun 19 12:38:29 2014  Saving outputs/alldata.csv
-Thu Jun 19 12:38:29 2014  Saving flux data...
-Thu Jun 19 12:38:29 2014  Saving outputs/fluxes.csv
-Thu Jun 19 12:38:29 2014  All done with egm4_v2.R
+Thu Jun 19 13:07:25 2014  Saving flux data...
+Thu Jun 19 13:07:25 2014  Saving outputs/alldata.csv
+Thu Jun 19 13:07:25 2014  Saving flux data...
+Thu Jun 19 13:07:25 2014  Saving outputs/fluxes.csv
+Thu Jun 19 13:07:25 2014  All done with egm4_v2.R

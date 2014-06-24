@@ -199,7 +199,7 @@ flux <- function( d, h ) {
 }
 
 fluxes <- flux( alldata, heights )
-fluxes <- fluxes[ order(sapply( fluxes$filename, function( x ) format_date( x ))), ]
+fluxes <- fluxes[ order( sapply( fluxes$filename, function( x ) format_date( x ) ) ), ] # sort by date
 
 print( summary( fluxes ) )
 
