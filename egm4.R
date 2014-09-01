@@ -1,15 +1,42 @@
+#!/usr/bin/env Rscript
+
 # R script to process EGM-4 data
 # BBL April 2014
 
 # Support functions and common definitions
 
+args = commandArgs( trailingOnly = TRUE )
 
+# Constants
 SCRIPTNAME		<- "egm4.R"
-INPUT_DIR		<- "./"
-OUTPUT_DIR		<- "outputs/"
-LOG_DIR			<- "logs/"
+OUTPUT_DIR		<- "out"
+LOG_DIR			<- "logs"
 SEPARATOR		<- "-------------------"
 MEAS_INTERVAL	<- 10
+HEIGHT_OPTIONS 	<- "heights.txt"
+SEP <- ifelse(Sys.info()['sysname'] != "Windows","/","\\")
+INPUT_DIR		<- args[1]
+DATE_FORMAT		<- "%B%d%Y"
+FILE_FORMAT 	<- ".+\\.dat"
+
+get_files <- function(){
+
+	files <- list.files( INPUT_DIR, FILE_FORMAT )
+
+	cat( "Reading the following files:\n" )
+	for ( file in files )
+		cat(file, sep = "\n")
+
+	return( unlist( files ) )
+
+}
+	
+
+printfiles <- function( files ) {
+	cat( "Reading the following files:" )
+	for ( file in files )
+		cat(file, sep = "\n")
+}
 
 # -----------------------------------------------------------------------------
 # Time-stamped output function
@@ -27,38 +54,32 @@ printdims <- function( d, dname=deparse( substitute( d ) ) ) {
 } # printdims
 
 # -----------------------------------------------------------------------------
-# Return matrix of memory consumption
-object.sizes <- function()
-{
-    return( rev( sort( sapply( ls( envir=.GlobalEnv ), function( object.name ) 
-        object.size( get( object.name ) ) ) ) ) )
-}
- 
-# -----------------------------------------------------------------------------
-# Save a ggplot figure
-saveplot <- function( pname, p=last_plot(), ptype=".pdf" ) {
-	stopifnot( file.exists( OUTPUT_DIR ) )
-	fn <- paste0( OUTPUT_DIR, "/", pname, ptype )
-	printlog( "Saving", fn )
-	ggsave( fn, p )
-} # saveplot
-
-# -----------------------------------------------------------------------------
 # Save a data frame
 savedata <- function( df, extension=".csv" ) {
 	stopifnot( file.exists( OUTPUT_DIR ) )
-	fn <- paste0( OUTPUT_DIR, "/", deparse( substitute( df ) ), extension )
+	fn <- paste0( OUTPUT_DIR, SEP, format( Sys.time(),"%d%B%Y_%H%M%S" ),"_fluxes",extension )
 	printlog( "Saving", fn )
-	write.csv( df, fn, row.names=F )
-} # saveplot
+	write.csv( df, fn, row.names=FALSE )
+} # savedata
 
-# -----------------------------------------------------------------------------
-# Open a csv file and return data
-read_csv <- function( fn, datadir="." ) {
-	fqfn <- paste( datadir, fn, sep="/" )
-	printlog( "Opening", fqfn )
-	read.csv( fqfn, stringsAsFactors=F )
-} # read_csv
+# Put height data in a frame.
+get_height <- function( ) {
+	heights <- paste0( INPUT_DIR, SEP, HEIGHT_OPTIONS )
+	stopifnot( file.exists( heights ) )
+	h <- read.table( heights, comment.char=";",sep="\t" )
+
+	names( h ) <- c("Plot", "Height")
+	arrange(h, Plot)
+
+	return( h )
+} #get_height
+
+# Convert a filename containing a date to a Date object.
+format_date <- function( fn ) {
+	date <- unlist( strsplit( fn, c( "P","." ), fixed=TRUE ) )[ 1 ]
+
+	return( as.Date( date, DATE_FORMAT ) )
+} #format_date
 
 # -----------------------------------------------------------------------------
 # Load requested libraries
@@ -67,20 +88,30 @@ loadlibs <- function( liblist ) {
 	loadedlibs <- vector()
 	for( lib in liblist ) {
 		printlog( "Loading", lib )
-		loadedlibs[ lib ] <- require( lib, character.only=T )
+		loadedlibs[ lib ] <- require( lib, character.only=TRUE )
 		if( !loadedlibs[ lib ] )
 			warning( "this package is not installed!" )
 	}
 	invisible( loadedlibs )
 } # loadlibs
 
+quality_control <- function( d ) {
+
+	mods <- dlply( d, .( Plot ), lm, formula = CO2_Ref ~ Sec )
+	r2 <- ldply( mods, .fun=function( x ){ round( summary( x )$r.squared, 2 ) } )
+	names( r2 ) <- c( "Plot", "R2" )
+	r2 <- r2[ order( r2$R2 ), ]
+	print( r2 )
+}
+
 # -----------------------------------------------------------------------------
 # read a process a single EGM4 output file, returning data frame
 read_egmfile <- function( fn ) {
-	fqfn <- paste0( INPUT_DIR, fn )
+	fqfn <- paste0( INPUT_DIR, SEP, fn )
 	printlog( "Reading", fqfn )
 	stopifnot( file.exists( fqfn ) )
-	d <- read.table( fqfn, comment.char=";", sep="\t" )
+	d <- read.table( fqfn, comment.char=";", sep="\t", na.strings="")
+	d <- d[ 1:19 ]
 	printdims( d )
 	names( d ) <- c( "Plot", "RecNo", "Day", "Month", "Hour", "Min", "CO2_Ref", "mb_Ref",
 		 "mbR_Temp", "Input_A", "Input_B", "Input_C", "Input_D", "Input_E", "Input_F", 
@@ -91,26 +122,18 @@ read_egmfile <- function( fn ) {
 	
 	# QC
 	printlog( "Computing CO2~Time R2 values for quality control..." )
-	mods <- dlply( d, .( Plot ), lm, formula = CO2_Ref ~ Sec )
-	r2 <- ldply( mods, .fun=function( x ){ round( summary( x )$r.squared, 2 ) } )
-	names( r2 ) <- c( "Plot", "R2" )
-	r2 <- r2[ order( r2$R2 ), ]
-	print( r2 )
+	quality_control( d ) 
 
-	d
+	return( d )
 } # read_egmfile
 
 # -----------------------------------------------------------------------------
 # compute fluxes
+# TODO: 
 compute_flux <- function( d ) {
 
 	m <- lm( CO2_Ref ~ Sec, data=d )
 	Resp_raw <- as.numeric( coef( m )[ 2 ] )	# i.e. the slope
-	
-	# TODO: height?
-	Height <- 1
-	# TODO: dry mass?
-	Dry.mass <- 1
 	
 	# We want to convert raw respiration (d[CO2]/dt) to a flux using
 	# A = dC/dt * V/S * Pa/RT (e.g. Steduto et al. 2002), where
@@ -124,25 +147,20 @@ compute_flux <- function( d ) {
 	#	R is universal gas constant (8.3 x 10-3 m-3 kPa mol-1 K-1)
 	#	T is air temperature (K)
 
-	sleeve_diam <- 3.5			# diameter, cm
-	sleeve_ht	<- 15.2 + 2		# height, cm; extra 2 is for cap
-	egm4_vol	<- 9			# internal system volume, cm3
-	lines_vol 	<- ( 1/8 * 2.54 / 2 ) ^2 * 122 * 2	# two 122-cm 1/8" lines, cm3
-	S 			<- ( sleeve_diam / 2 ) * pi	# note cm2, not m2!
-	sleeve_vol <- ( sleeve_ht - Height ) * S
-	V	<- ( egm4_vol + lines_vol + sleeve_vol ) / 100^3		# m3
-	Pa 			<- 101						# kPa				(Richland is ~120 m asl)
-	R 			<- 8.3e-3					# m-3 kPa mol-1 K-1
+	ring_r 		<- 5									# diameter, cm
+	sleeve_ht	<- as.numeric( d$Height[ 1 ] ) 			# height, cm
+	egm4_vol	<- 2427									# internal system volume, cm3
+	S 			<- (pi * ring_r ^ 2) * 1.0e-3			# note m2, not cm2!
+	sleeve_vol 	<- sleeve_ht * S 						# cm3
+	V			<- ( egm4_vol + sleeve_vol ) * 1.0e-6	# m3, not cm3!
+	R 			<- 8.3145e-3							# m-3 kPa mol-1 K-1
+	Kelvin		<- 273.15								# C to K conversion
+	avg_temp 	<- mean( d$Input_C )					# assumes EGM temperature probe connected
+	Pa 			<- 101									# kPa
 
-	Tair <- mean( d$Input_C )		# assumes EGM temperature probe connected
-	
-	# Calculate mass-corrected respiration, umol/g soil/s
-	Resp_mass <- Resp_raw * V/Dry.mass * Pa/( R*( 273.1+Tair ) )
+	flux <- Resp_raw * ( V / S ) * Pa / ( R * avg_temp )
 
-	# Convert from umol/g soil/s to mgC/kg soil/day
-	flux <- Resp_mass / 1e6 * 12 * 1000 * 1000 * 60 * 60 * 24
-
-	return( c( Tair=Tair, V=V, S=S, Day=mean( d$Day ), Month=mean( d$Month ), N=nrow( d ), flux=flux ) )
+	return( c( Tair=avg_temp, V=V, S=S, Day=mean( d$Day ), Month=mean( d$Month ), N=nrow( d ), flux=flux ) )
 }
 
 # ==============================================================================
@@ -157,16 +175,15 @@ if( !file.exists( LOG_DIR ) ) {
 	dir.create( LOG_DIR )
 }
 
-sink( paste0( LOG_DIR, SCRIPTNAME, ".txt" ), split=T )
+sink( paste0( LOG_DIR, SCRIPTNAME, ".txt" ), split=TRUE )
 
 printlog( "Welcome to", SCRIPTNAME )
 
-loadlibs( c( "ggplot2", "reshape", "plyr" ) )
-theme_set( theme_bw() )
+loadlibs( c( "plyr" ) )
 
 alldata <- data.frame()
-filelist <- list.files( path=INPUT_DIR, pattern="*.dat" )
-for( fn in filelist ) {
+
+for( fn in get_files() ) {
 	printlog( SEPARATOR )
 	alldata <- rbind( alldata, read_egmfile( fn ) )
 }
@@ -178,8 +195,19 @@ printdims( alldata )
 printlog( "Merging respiration data with dry mass data..." )
 # TODO
 
+heights <- get_height()
+
 printlog( "Computing fluxes..." )
-fluxes <- ddply( alldata, .( filename, Plot ), .fun=compute_flux )
+
+# Compute flux per-plot with height correction.
+flux <- function( d, h ) {
+	d$Height <- sapply( d$Plot, function( x ) h[ which( x == h$Plot ),"Height" ] )
+	flux <- ddply( d, .( filename, Plot ), .fun=compute_flux )
+	return( flux )
+}
+
+fluxes <- flux( alldata, heights )
+fluxes <- fluxes[ order( sapply( fluxes$filename, function( x ) format_date( x ) ) ), ] # sort by date
 
 print( summary( fluxes ) )
 
@@ -189,5 +217,5 @@ printlog( "Saving flux data..." )
 savedata( fluxes )
 
 printlog( "All done with", SCRIPTNAME )
-print( sessionInfo() )
+#print( sessionInfo() )
 sink()
