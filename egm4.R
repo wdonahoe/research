@@ -83,16 +83,44 @@ format_date <- function( fn ) {
 
 # -----------------------------------------------------------------------------
 # Load requested libraries
+# -----------------------------------------------------------------------------
+# loadlibs
+# Load a list of libraries
+# Arguments: liblist -- A character vector of library names.
+#
 loadlibs <- function( liblist ) {
-	printlog( "Loading libraries..." )
-	loadedlibs <- vector()
-	for( lib in liblist ) {
-		printlog( "Loading", lib )
-		loadedlibs[ lib ] <- require( lib, character.only=TRUE )
-		if( !loadedlibs[ lib ] )
-			warning( "this package is not installed!" )
-	}
-	invisible( loadedlibs )
+
+  	#printlog( "Loading libraries..." )
+  	loadedlibs <- vector()
+  	not_installed <- vector()
+
+  	for( lib in liblist ) {
+
+    		#printlog( "Loading", lib )
+    		loadedlibs[ lib ] <- require( lib, character.only=TRUE, warn.conflicts=FALSE )
+    		if( !loadedlibs[ lib ] ){
+
+     			warning( "this package is not installed!" )
+      			not_installed <- c(not_installed,lib)
+
+    		}
+  	}
+
+  	if ( length(not_installed) != 0){
+
+    		#print("Installing packages.")
+    		chooseCRANmirror(graphics=FALSE,ind=85) # Choose USA (MD)
+    		install.packages(not_installed)
+
+		for( lib in not_installed ) {
+
+			#printlog( "Loading", lib )
+			loadedlibs[ lib ] <- require( lib, character.only=TRUE, warn.conflicts=FALSE )
+
+		}	
+  	}
+  	invisible( loadedlibs )
+
 } # loadlibs
 
 quality_control <- function( d ) {
