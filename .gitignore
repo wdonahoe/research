@@ -1,8 +1,0 @@
-# exclude everything except directory src
-/*
-!/src
-/src/*
-!/src/egm4.py
-!/src/egm4.R
-
-
